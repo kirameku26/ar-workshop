@@ -19,19 +19,20 @@
 
         #status {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
+            z-index: 9999;
+            top: 10px;
+            left: 10px;
             padding: 10px;
             background: white;
-            font-size: 16px;
+            color: black;
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
 
-<div id="status">読み込み中...</div>
+<div id="status">起動中...</div>
 
 <a-scene
     mindar-image="imageTargetSrc: ./target.mind;"
@@ -49,12 +50,10 @@
         id="target"
         mindar-image-target="targetIndex: 0">
 
-        <!-- 最初は非表示 -->
         <a-gltf-model
             id="modelObject"
             src="#model"
             visible="false"
-            position="0 0 0"
             scale="1 1 1">
         </a-gltf-model>
 
@@ -70,40 +69,52 @@
 <script>
     const status = document.getElementById("status");
     const model = document.getElementById("modelObject");
-    const target = document.getElementById("target");
 
     let modelLoaded = false;
     let targetFound = false;
 
-    // GLBの読み込み成功
+    // ARシステム起動
+    document.querySelector("a-scene").addEventListener("arReady", function () {
+        status.innerText = "AR起動成功・ターゲットを探しています...";
+    });
+
+    // AR起動エラー
+    document.querySelector("a-scene").addEventListener("arError", function (event) {
+        status.innerText = "AR起動エラー";
+        console.log(event);
+    });
+
+    // GLB読み込み成功
     model.addEventListener("model-loaded", function () {
         modelLoaded = true;
 
-        status.innerText = "GLB読み込み成功";
+        status.innerText = "GLB読み込み成功・ターゲットを探しています...";
 
         if (targetFound) {
             model.setAttribute("visible", "true");
+            status.innerText = "表示成功";
         }
     });
 
-    // GLBの読み込み失敗
+    // GLB読み込み失敗
     model.addEventListener("model-error", function () {
-        status.innerText = "GLBの読み込み失敗";
+        status.innerText = "GLB読み込み失敗";
     });
 
-    // ターゲットを認識
-    target.addEventListener("targetFound", function () {
+    // ターゲット認識
+    document.querySelector("#target").addEventListener("targetFound", function () {
         targetFound = true;
-
-        status.innerText = "ターゲット認識";
 
         if (modelLoaded) {
             model.setAttribute("visible", "true");
+            status.innerText = "ターゲット認識・モデル表示";
+        } else {
+            status.innerText = "ターゲット認識・GLB読み込み中";
         }
     });
 
     // ターゲットを見失った
-    target.addEventListener("targetLost", function () {
+    document.querySelector("#target").addEventListener("targetLost", function () {
         targetFound = false;
 
         model.setAttribute("visible", "false");
