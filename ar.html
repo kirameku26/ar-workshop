@@ -2,52 +2,20 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width,
-                   initial-scale=1.0,
-                   maximum-scale=1.0,
-                   user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>AR</title>
 
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: black;
-        }
-
-        a-scene {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        canvas.a-canvas {
-            width: 100vw !important;
-            height: 100vh !important;
-        }
-    </style>
 </head>
 
 <body>
 
 <a-scene
     mindar-image="imageTargetSrc: ./target.mind;"
-    embedded
+    color-space="sRGB"
+    renderer="colorManagement: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
@@ -58,38 +26,22 @@
         </a-asset-item>
     </a-assets>
 
-    <a-entity mindar-image-target="targetIndex: 0">
-
-        <a-gltf-model
-            src="#model"
-            position="0 0 0"
-            rotation="0 0 0"
-            scale="1 1 1">
-        </a-gltf-model>
-
-    </a-entity>
-
     <a-camera
         position="0 0 0"
         look-controls="enabled: false">
     </a-camera>
 
+    <a-entity mindar-image-target="targetIndex: 0">
+
+        <a-gltf-model
+            src="#model"
+            position="0 0 0"
+            scale="0.5 0.5 0.5">
+        </a-gltf-model>
+
+    </a-entity>
+
 </a-scene>
-
-<script>
-    // 画面の向きが変わったときにAR画面を更新
-    window.addEventListener("orientationchange", function () {
-        setTimeout(function () {
-            window.dispatchEvent(new Event("resize"));
-        }, 500);
-    });
-
-    window.addEventListener("resize", function () {
-        setTimeout(function () {
-            window.dispatchEvent(new Event("resize"));
-        }, 100);
-    });
-</script>
 
 </body>
 </html>
