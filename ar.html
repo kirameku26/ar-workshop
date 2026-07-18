@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AR</title>
+    <title>MindAR Test</title>
 
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -32,95 +32,50 @@
 
 <body>
 
-<div id="status">起動中...</div>
+<div id="status">読み込み中...</div>
 
 <a-scene
-    mindar-image="imageTargetSrc: ./targets.mind;"
+    mindar-image="imageTargetSrc: ./target.mind;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
-
-    <a-assets>
-        <a-asset-item
-            id="model"
-            src="./xx.glb">
-        </a-asset-item>
-    </a-assets>
-
-    <a-entity
-        id="target"
-        mindar-image-target="targetIndex: 0">
-
-        <a-gltf-model
-            id="modelObject"
-            src="#model"
-            visible="false"
-            scale="1 1 1">
-        </a-gltf-model>
-
-    </a-entity>
 
     <a-camera
         position="0 0 0"
         look-controls="enabled: false">
     </a-camera>
 
+    <a-entity
+        mindar-image-target="targetIndex: 0">
+    </a-entity>
+
 </a-scene>
 
 <script>
-    const status = document.getElementById("status");
-    const model = document.getElementById("modelObject");
 
-    let modelLoaded = false;
-    let targetFound = false;
+const status = document.getElementById("status");
+const scene = document.querySelector("a-scene");
+const target = document.querySelector("[mindar-image-target]");
 
-    // ARシステム起動
-    document.querySelector("a-scene").addEventListener("arReady", function () {
-        status.innerText = "AR起動成功・ターゲットを探しています...";
-    });
+scene.addEventListener("loaded", function () {
+    status.innerText = "A-Frame読み込み成功";
+});
 
-    // AR起動エラー
-    document.querySelector("a-scene").addEventListener("arError", function (event) {
-        status.innerText = "AR起動エラー";
-        console.log(event);
-    });
+scene.addEventListener("arReady", function () {
+    status.innerText = "AR起動成功\n画像をカメラに映してください";
+});
 
-    // GLB読み込み成功
-    model.addEventListener("model-loaded", function () {
-        modelLoaded = true;
+scene.addEventListener("arError", function () {
+    status.innerText = "AR起動エラー";
+});
 
-        status.innerText = "GLB読み込み成功・ターゲットを探しています...";
+target.addEventListener("targetFound", function () {
+    status.innerText = "ターゲット認識成功！";
+});
 
-        if (targetFound) {
-            model.setAttribute("visible", "true");
-            status.innerText = "表示成功";
-        }
-    });
+target.addEventListener("targetLost", function () {
+    status.innerText = "ターゲットを見失いました";
+});
 
-    // GLB読み込み失敗
-    model.addEventListener("model-error", function () {
-        status.innerText = "GLB読み込み失敗";
-    });
-
-    // ターゲット認識
-    document.querySelector("#target").addEventListener("targetFound", function () {
-        targetFound = true;
-
-        if (modelLoaded) {
-            model.setAttribute("visible", "true");
-            status.innerText = "ターゲット認識・モデル表示";
-        } else {
-            status.innerText = "ターゲット認識・GLB読み込み中";
-        }
-    });
-
-    // ターゲットを見失った
-    document.querySelector("#target").addEventListener("targetLost", function () {
-        targetFound = false;
-
-        model.setAttribute("visible", "false");
-
-        status.innerText = "ターゲットを探しています...";
-    });
 </script>
 
 </body>
